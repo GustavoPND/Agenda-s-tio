@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Agenda do Sítio</title>
+<style>
+:root{--bg:#f4f4ef;--card:#fff;--tx:#1d2419;--mu:#6c7566;--g:#4a5d2a;--gs:#e6ebd8;--red:#b0392b;--ln:#e2e3da;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#151812;--card:#1f241a;--tx:#eef1e6;--mu:#98a08f;--g:#a9c46a;--gs:#2b3320;--red:#ef7d6d;--ln:#2e3427}}
+:root[data-theme="dark"]{--bg:#151812;--card:#1f241a;--tx:#eef1e6;--mu:#98a08f;--g:#a9c46a;--gs:#2b3320;--red:#ef7d6d;--ln:#2e3427}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--bg);color:var(--tx);font:18px/1.4 "Avenir Next","Segoe UI",system-ui,sans-serif;-webkit-tap-highlight-color:transparent}
+main{max-width:640px;margin:0 auto;padding:22px 16px 170px}
+h1{font-size:34px;margin:0;letter-spacing:-.02em}
+.sub0{color:var(--mu);margin:2px 0 20px;font-size:17px}
+h2{font-size:15px;color:var(--mu);font-weight:600;margin:26px 0 10px}
+.card{background:var(--card);border:1px solid var(--ln);border-radius:16px;padding:16px;margin-bottom:10px;cursor:pointer}
+.t{font-size:20px;font-weight:600}.s{color:var(--mu);margin-top:2px}.s.late{color:var(--red);font-weight:600}
+.o{font-size:16px;color:var(--mu);margin-top:6px;font-style:italic}
+.acts{display:flex;gap:8px;margin-top:12px}
+button{font:inherit;cursor:pointer;border:0;border-radius:12px;padding:12px 16px;min-height:48px;background:var(--gs);color:var(--g);font-weight:600}
+button.p{background:var(--g);color:var(--bg)}button.d{background:none;color:var(--red)}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--g);outline-offset:2px}
+.acts button{flex:1}
+.emp{color:var(--mu);padding:8px 2px}
+nav{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--ln);display:flex;padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px))}
+nav button{flex:1;background:none;color:var(--mu);font-size:16px}nav button.on{color:var(--g)}
+.fab{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(76px + env(safe-area-inset-bottom,0px));box-shadow:0 6px 20px rgba(0,0,0,.25);border-radius:30px;padding:0 28px;min-height:58px;font-size:19px}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;justify-content:center;z-index:9}
+.sh{background:var(--bg);width:100%;max-width:640px;max-height:92%;overflow:auto;border-radius:24px 24px 0 0;padding:20px 16px calc(20px + env(safe-area-inset-bottom,0px))}
+.sh h3{margin:0 0 12px;font-size:22px}
+label{display:block;color:var(--mu);font-size:15px;margin:12px 0 4px}
+input,textarea,select{width:100%;font:inherit;padding:13px;border-radius:12px;border:1px solid var(--ln);background:var(--card);color:var(--tx)}
+.seg{display:flex;gap:8px;margin:12px 0}.seg button{flex:1}.seg button.on{background:var(--g);color:var(--bg)}
+.row{display:flex;gap:10px}.row>div{flex:1}
+.bar{display:flex;gap:8px;align-items:center;margin-bottom:12px}.bar b{flex:1;text-align:center;text-transform:capitalize}
+.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:8px;text-align:center}
+.grid button{padding:0;min-height:46px;background:none;color:var(--tx);position:relative;border-radius:12px}
+.grid button.sel{background:var(--g);color:var(--bg)}.grid button.now{box-shadow:inset 0 0 0 2px var(--g)}
+.grid button i{position:absolute;bottom:5px;left:50%;margin-left:-3px;width:6px;height:6px;border-radius:3px;background:var(--g)}
+.grid button.sel i{background:var(--bg)}.grid small{color:var(--mu)}
+@media(min-width:900px){
+main{margin-left:220px;max-width:1080px;padding:36px 44px 60px}
+nav{top:0;right:auto;width:220px;flex-direction:column;border-top:0;border-right:1px solid var(--ln);padding:96px 12px 12px;gap:4px}
+nav button{text-align:left;padding:0 16px;font-size:18px}nav button.on{background:var(--gs)}
+.fab{left:16px;top:24px;bottom:auto;transform:none;width:188px;padding:0;border-radius:14px;box-shadow:none}
+.ov{align-items:center}.sh{border-radius:20px;max-width:540px}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:0 28px}
+.card:hover{border-color:var(--g)}}
+
+.days{display:flex;gap:6px}.days button{flex:1;padding:0;min-height:48px;font-size:15px}.days button.on{background:var(--g);color:var(--bg)}.wide{width:100%;margin-bottom:12px}.seg button{padding:0 6px;font-size:16px}
+.addtop{display:none}
+@media(min-width:800px){body{display:flex;flex-direction:column}
+nav{order:-1;position:static;width:100%;max-width:640px;margin:0 auto;background:none;border:0;padding:18px 16px 0;gap:8px}
+nav button{flex:none;padding:0 18px}nav .addtop{display:block;margin-left:auto}
+.fab{display:none}main{width:100%;padding-bottom:60px}
+.ov{align-items:center}.sh{border-radius:24px;max-width:560px}}
+</style></head><body>
+<main id="m"></main>
+<button class="p fab" data-act="add">+ Adicionar</button>
+<nav id="nv"></nav>
+<div id="ov"></div>
+<script>
+const K='agenda-sitio-v1',$=s=>document.querySelector(s),pad=n=>String(n).padStart(2,'0');
+const iso=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()),P=s=>new Date(s+'T00:00');
+const T=iso(new Date()),add=(s,n)=>{const d=P(s);d.setDate(d.getDate()+n);return iso(d)};
+const diff=(a,b)=>Math.round((P(a)-P(b))/864e5),fmt=s=>pad(P(s).getDate())+'/'+pad(P(s).getMonth()+1);
+const rel=s=>{const d=diff(s,T);return d==0?'Hoje':d==1?'Amanhã':fmt(s)},pl=(n,w)=>n+' '+w+(n==1?'':'s');
+const esc=s=>String(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let S=null,RAW=null;try{RAW=localStorage.getItem(K);S=JSON.parse(RAW||'null')}catch(e){}
+if(RAW&&!Array.isArray(S)){try{localStorage.setItem(K+'-corrompido',RAW)}catch(e){}}
+function norm(i){const t=i.tipo=='a'||i.tipo=='r'?i.tipo:'t';const o={obs:'',hora:'',fim:null,dataFim:'',dur:0,...i,tipo:t};
+ o.titulo=String(o.titulo||'Sem título');o.obs=o.obs||'';o.id=o.id||Date.now()+Math.floor(Math.random()*1e6);
+ if(t=='r'){o.dias=Array.isArray(o.dias)?o.dias:[];o.feitos=Array.isArray(o.feitos)?o.feitos:[];o.inicio=o.inicio||T;o.status=o.status=='pausada'?'pausada':'ativo'}
+ else if(t=='a'){o.inicio=o.inicio||T;o.status=o.status=='encerrado'?'encerrado':'ativo'}
+ else{o.data=o.data||T;o.status=o.status=='concluida'?'concluida':'pendente'}
+ return o}
+S=Array.isArray(S)?S.filter(i=>i&&typeof i=='object').map(norm):[];
+const save=()=>{try{localStorage.setItem(K,JSON.stringify(S))}catch(e){}};
+let tab='hoje',mode='mes',sel=T,q='';
+const endOf=i=>i.dur?add(i.inicio,i.dur-1):(i.dataFim||null);
+const occ=(i,d)=>i.tipo=='r'&&i.status=='ativo'&&d>=i.inicio&&i.dias.includes(P(d).getDay());
+const rot=i=>{const n=['domingo','segunda','terça','quarta','quinta','sexta','sábado'],l=i.dias.map(x=>n[x]);if(l.length==7)return'Todo dia';return(i.dias.every(x=>x==0||x==6)?'Todo ':'Toda ')+(l.length>1?l.slice(0,-1).join(', ')+' e '+l.slice(-1):l[0])};
+function sub(i){
+ if(i.tipo=='r')return[(i.status=='ativo'?'':'Pausada · ')+rot(i),''];
+ if(i.tipo=='t'){if(i.status=='concluida')return['Concluído em '+fmt(i.fim),''];
+  const d=diff(i.data,T);if(d<0)return['Atrasado há '+pl(-d,'dia'),'late'];
+  return[(d==0?'Hoje':rel(i.data))+(i.hora?' às '+i.hora:''),'']}
+ if(i.status=='encerrado')return[fmt(i.inicio)+' até '+fmt(i.fim)+' · Duração: '+pl(diff(i.fim,i.inicio)+1,'dia'),''];
+ const d=diff(T,i.inicio);if(d<0)return['Começa '+rel(i.inicio).toLowerCase(),''];
+ const e=endOf(i);
+ if(i.dur)return[d<i.dur?`Dia ${d+1} de ${i.dur}`:'Prazo terminou','' ];
+ if(e){const r=diff(e,T);return[r>1?`Faltam ${r} dias`:r==1?'Termina amanhã':r==0?'Termina hoje':'Terminou há '+pl(-r,'dia'),r<0?'late':'']}
+ return[d==0?'Iniciado hoje':`Há ${pl(d,'dia')} · Iniciado em ${fmt(i.inicio)}`,'']}
+function card(i,acts,text){const[s,c]=text?[text,'']:sub(i);
+ return`<div class="card" data-act="edit" data-id="${i.id}"><div class="t">${esc(i.titulo)}</div><div class="s ${c}">${s}</div>${i.obs?`<div class="o">${esc(i.obs)}</div>`:''}${acts?`<div class="acts">${acts}</div>`:''}</div>`}
+const btn=(a,id,l,p)=>`<button class="${p?'p':''}" data-act="${a}" data-id="${id}">${l}</button>`;
+const act=i=>i.tipo=='r'?'':i.status=='pendente'?btn('done',i.id,'Concluir',1):i.status=='ativo'?btn('end',i.id,'Encerrar'):'';
+const sortD=k=>(a,b)=>(a[k]>b[k])-(a[k]<b[k]);
+const rcard=(i,d)=>{const f=i.feitos.includes(d);return card(i,btn('rdone',i.id,f?'Desfazer':'Concluir',!f),rot(i)+(f?' · feito hoje':''))};
+function hoje(){
+ const ts=S.filter(i=>i.tipo=='t'&&i.status=='pendente'&&i.data<=T).sort(sortD('data')),rs=S.filter(i=>occ(i,T));
+ const as=S.filter(i=>i.tipo=='a'&&i.status=='ativo'&&i.inicio<=T).sort(sortD('inicio'));
+ const nx=[...S.filter(i=>i.tipo=='t'&&i.status=='pendente'&&i.data>T).map(i=>({i,d:i.data})),...S.filter(i=>i.tipo=='a'&&i.status=='ativo'&&i.inicio>T).map(i=>({i,d:i.inicio})),...S.filter(i=>i.tipo=='r'&&i.status=='ativo').map(i=>{for(let k=1;k<=7;k++)if(occ(i,add(T,k)))return{i,d:add(T,k)}}).filter(Boolean)].sort(sortD('d')).slice(0,5);
+ const first=ts.map(i=>card(i,act(i)+(diff(i.data,T)<0?btn('edit',i.id,'Mudar data'):''))).join('')+rs.map(i=>rcard(i,T)).join('');
+ return`<h1>Hoje</h1><p class="sub0">${new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'})}</p>
+ <h2>Para fazer</h2>${first||'<div class="emp">Nada pendente hoje.</div>'}
+ <h2>Acompanhamentos ativos</h2>${as.map(i=>card(i,act(i))).join('')||'<div class="emp">Nenhum acompanhamento ativo.</div>'}
+ <h2>Próximos</h2>${nx.map(x=>`<div class="s" style="margin:0 2px 4px">${rel(x.d)}</div>`+card(x.i,'',x.i.tipo=='a'?'Começa '+rel(x.d).toLowerCase():x.i.tipo=='r'?rot(x.i):'')).join('')||'<div class="emp">Nada agendado.</div>'}`}
+function onDay(d){
+ const ts=S.filter(i=>i.tipo=='t'&&i.data==d);
+ const as=S.filter(i=>i.tipo=='a'&&i.inicio<=d&&(endOf(i)?d<=endOf(i):i.status=='ativo'?d<=T:d<=i.fim));const rs=S.filter(i=>occ(i,d));return{ts,as,rs}}
+function dayList(d){const{ts,as,rs}=onDay(d);
+ return`<h2>${P(d).toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'})}</h2><button class="p wide" data-act="addday">+ Adicionar neste dia</button>`+ts.map(i=>card(i,'')).join('')+rs.map(i=>card(i,'',rot(i)+(i.feitos.includes(d)?' · feito':''))).join('')+
+ (as.length?`<h2>Acompanhamentos ativos</h2>`+as.map(i=>card(i,'',`Dia ${diff(d,i.inicio)+1}`)).join(''):'')+(ts.length+as.length+rs.length?'':'<div class="emp">Nada neste dia.</div>')}
+function agenda(){
+ const st=new Date(P(sel));let cells='',lbl;
+ const dot=d=>{const o=onDay(d);return o.ts.length+o.as.length+o.rs.length?'<i></i>':''};
+ const dbtn=(d,x)=>`<button data-act="pick" data-d="${d}" class="${d==sel?'sel':''} ${d==T?'now':''}">${x}${dot(d)}</button>`;
+ if(mode=='mes'){lbl=st.toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
+  const f=new Date(st.getFullYear(),st.getMonth(),1),n=new Date(st.getFullYear(),st.getMonth()+1,0).getDate();
+  cells='<div class="grid">'+'DSTQQSS'.split('').map(c=>`<small>${c}</small>`).join('')+'<span></span>'.repeat(f.getDay())+
+  Array.from({length:n},(_,k)=>dbtn(iso(new Date(f.getFullYear(),f.getMonth(),k+1)),k+1)).join('')+'</div>'}
+ else if(mode=='semana'){const s0=add(sel,-P(sel).getDay());lbl=fmt(s0)+' – '+fmt(add(s0,6));
+  cells='<div class="grid">'+Array.from({length:7},(_,k)=>{const d=add(s0,k);return dbtn(d,P(d).getDate())}).join('')+'</div>'}
+ else lbl=rel(sel);
+ return`<h1>Agenda</h1><div class="seg">${['dia','semana','mes'].map(x=>`<button class="${mode==x?'on':''}" data-act="mode" data-d="${x}">${x=='mes'?'Mês':x[0].toUpperCase()+x.slice(1)}</button>`).join('')}</div>
+ <div class="bar"><button data-act="nav" data-d="-1">‹</button><b>${lbl}</b><button data-act="nav" data-d="1">›</button></div>${cells}${dayList(sel)}`}
+function hlist(){const w=q.trim().toLowerCase();
+ let l=w?S.filter(i=>(i.titulo+' '+i.obs).toLowerCase().includes(w)).sort((a,b)=>(b.data||b.inicio)>(a.data||a.inicio)?1:-1):[...S.filter(i=>i.status=='concluida'||i.status=='encerrado'),...S.flatMap(i=>i.tipo=='r'?i.feitos.map(f=>({...i,fim:f,_t:'Feito em '+fmt(f)})):[])].sort((a,b)=>b.fim>a.fim?1:-1);
+ return l.map(i=>i._t?card(i,'',i._t):card(i,act(i))).join('')||`<div class="emp">${w?'Nada encontrado.':'Nada concluído ainda.'}</div>`}
+function hist(){return`<h1>Histórico</h1><p class="sub0">Pesquise também tarefas e acompanhamentos ativos.</p><input id="q" type="search" placeholder="Pesquisar (ex.: Radahn)" value="${esc(q)}"><div id="hl" style="margin-top:14px">${hlist()}</div>
+ <h2>Seus dados</h2><div class="acts"><button data-act="export">Exportar</button><button data-act="import">Importar</button></div><input type="file" id="fi" accept=".json,application/json" hidden><div class="s" id="dmsg" style="margin-top:8px"></div>`}
+function render(){$('#m').innerHTML={hoje,agenda,hist}[tab]();
+ $('#nv').innerHTML=[['hoje','Hoje'],['agenda','Agenda'],['hist','Histórico']].map(([k,l])=>`<button class="${tab==k?'on':''}" data-act="tab" data-d="${k}">${l}</button>`).join('')+'<button class="p addtop" data-act="add">+ Adicionar</button>'}
+function sheet(id,dt){dt=dt||T;const it=S.find(i=>i.id==id)||{tipo:'t',titulo:'',data:dt,inicio:dt,hora:'',obs:'',dur:0,dataFim:'',status:'pendente',dias:[],feitos:[]};
+ let tipo=it.tipo,dias=(it.dias||[]).slice();const ed=!!id;
+ const keep=()=>{it.titulo=$('#f-t').value;it.obs=$('#f-o').value};
+ const draw=()=>{const t=tipo=='t',r=tipo=='r';if(r&&!dias.length)dias=[P(it.inicio||dt).getDay()];
+ $('#ov').innerHTML=`<div class="ov"><div class="sh"><h3>${ed?'Editar':'O que você quer lembrar?'}</h3>
+ <input id="f-t" placeholder="${r?'Ex.: Lactotropin nas vacas':'Ex.: Desmamando Radahn'}" value="${esc(it.titulo)}">
+ ${ed?'':`<div class="seg">${[['t','Tarefa'],['a','Acompanhamento'],['r','Rotina']].map(([k,l])=>`<button class="${tipo==k?'on':''}" data-act="ty" data-d="${k}">${l}</button>`).join('')}</div>`}
+ ${t?`<div class="row"><div><label>Data</label><input id="f-d" type="date" value="${it.data||dt}"></div><div><label>Horário (opcional)</label><input id="f-h" type="time" value="${it.hora||''}"></div></div>`
+ :r?`<label>Repete toda semana em</label><div class="days">${['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'].map((l,n)=>`<button class="${dias.includes(n)?'on':''}" data-act="wd" data-d="${n}">${l}</button>`).join('')}</div>`
+ :`<div class="row"><div><label>Data de início</label><input id="f-i" type="date" value="${it.inicio||dt}"></div><div><label>Duração em dias (opcional)</label><input id="f-u" type="number" min="1" value="${it.dur||''}"></div></div><label>Data final (opcional)</label><input id="f-e" type="date" value="${it.dataFim||''}">`}
+ ${ed?`<label>Situação</label><select id="f-s">${(t?[['pendente','Pendente'],['concluida','Concluída']]:r?[['ativo','Ativa'],['pausada','Pausada']]:[['ativo','Ativo'],['encerrado','Encerrado']]).map(([v,l])=>`<option value="${v}" ${it.status==v?'selected':''}>${l}</option>`).join('')}</select>`:''}
+ <label>Observação (opcional)</label><textarea id="f-o" rows="2">${esc(it.obs)}</textarea>
+ <div class="acts" style="margin-top:18px"><button data-act="close">Cancelar</button><button class="p" data-act="ok">${ed?'Salvar':t?'Salvar tarefa':r?'Salvar rotina':'Iniciar acompanhamento'}</button></div>
+ ${ed?`<div class="acts"><button class="d" data-act="del" data-id="${id}">Excluir</button></div>`:''}</div></div>`;
+ {const h=$('.sh');if(h&&h.scrollIntoView)h.scrollIntoView({block:'center'})}
+ window.__ty=x=>{keep();tipo=x;draw()};
+ window.__wd=n=>{keep();dias=dias.includes(n)?dias.filter(x=>x!=n):[...dias,n];draw()};
+ window.__ok=()=>{const ti=$('#f-t').value.trim();if(!ti){$('#f-t').focus();return}
+  const o={...it,tipo,titulo:ti,obs:$('#f-o').value.trim()};
+  if(tipo=='t'){o.data=$('#f-d').value||T;o.hora=$('#f-h').value;o.status=ed?$('#f-s').value:'pendente'}
+  else if(tipo=='a'){o.inicio=$('#f-i').value||T;o.dur=+$('#f-u').value||0;o.dataFim=o.dur?'':$('#f-e').value;o.status=ed?$('#f-s').value:'ativo'}
+  else{o.dias=[...dias].sort();o.feitos=it.feitos||[];o.inicio=it.inicio||dt;o.status=ed?$('#f-s').value:'ativo'}
+  if(ed&&o.status!=it.status)o.fim=(o.status=='concluida'||o.status=='encerrado')?T:null;
+  if(ed)S=S.map(i=>i.id==id?o:i);else S.push({...o,id:Date.now(),fim:null});
+  save();$('#ov').innerHTML='';render()}};draw()}
+function confirmar(msg,label,fn){$('#ov').innerHTML=`<div class="ov"><div class="sh"><h3>${msg}</h3><div class="acts"><button data-act="close">Cancelar</button><button class="p" data-act="yes">${label}</button></div></div></div>`;window.__yes=()=>{fn();save();$('#ov').innerHTML='';render()}}
+const msg=t=>{const e=$('#dmsg');if(e)e.textContent=t};
+function doExport(){const nome='agenda-sitio-backup-'+T+'.json';
+ const b=new Blob([JSON.stringify({app:'agenda-sitio',versao:1,exportadoEm:new Date().toISOString(),dados:S},null,1)],{type:'application/json'});
+ const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=nome;document.body.appendChild(a);a.click();a.remove();msg('Arquivo baixado: '+nome+' ('+S.length+' registros)')}
+function readFile(f){if(!f)return;const r=new FileReader();r.onload=()=>{let j;try{j=JSON.parse(r.result)}catch(e){msg('Arquivo inválido: não é um backup do app.');return}
+ const arr=Array.isArray(j)?j:j&&Array.isArray(j.dados)?j.dados:null;if(!arr){msg('Arquivo inválido: não encontrei registros.');return}
+ const ok=arr.filter(i=>i&&typeof i=='object'&&i.titulo).map(norm);if(!ok.length){msg('Nenhum registro válido no arquivo.');return}
+ window.__imp=ok;$('#ov').innerHTML=`<div class="ov"><div class="sh"><h3>Importar ${ok.length} registros</h3><p class="s">Somar mantém o que você já tem e acrescenta o que for novo. Substituir troca tudo pelo conteúdo do arquivo (uma cópia do que existe hoje fica guardada no navegador).</p><div class="acts"><button data-act="close">Cancelar</button><button data-act="imp-add">Somar</button><button class="p" data-act="imp-rep">Substituir</button></div></div></div>`};
+ r.readAsText(f)}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b)return;const a=b.dataset.act,id=+b.dataset.id,d=b.dataset.d;
+ if(a=='tab'){tab=d;render()}else if(a=='add')sheet(0,tab=='agenda'?sel:T);else if(a=='addday')sheet(0,sel);else if(a=='edit')sheet(id);
+ else if(a=='done'){const i=S.find(x=>x.id==id);i.status='concluida';i.fim=T;save();render()}
+ else if(a=='end')confirmar('Encerrar este acompanhamento?','Encerrar',()=>{const i=S.find(x=>x.id==id);i.status='encerrado';i.fim=T});
+ else if(a=='del')confirmar('Tem certeza que deseja excluir?','Excluir',()=>{S=S.filter(x=>x.id!=id)});
+ else if(a=='close')$('#ov').innerHTML='';else if(a=='ty')__ty(d);else if(a=='wd')__wd(+d);else if(a=='rdone'){const i=S.find(x=>x.id==id);i.feitos=i.feitos.includes(T)?i.feitos.filter(x=>x!=T):[...i.feitos,T];save();render()}else if(a=='ok')__ok();else if(a=='yes')__yes();
+ else if(a=='export')doExport();else if(a=='import')$('#fi').click();
+ else if(a=='imp-add'){const ids=new Set(S.map(i=>i.id)),nv=__imp.filter(i=>!ids.has(i.id));S=[...S,...nv];save();$('#ov').innerHTML='';render();msg(nv.length?`Importado: ${nv.length} registros novos somados.`:'Nada novo: todos os registros já existiam.')}
+ else if(a=='imp-rep'){try{localStorage.setItem(K+'-antes-de-importar',JSON.stringify(S))}catch(x){}S=__imp;save();$('#ov').innerHTML='';render();msg(`Importado: ${S.length} registros. A cópia dos dados anteriores ficou guardada no navegador.`)}
+ else if(a=='mode'){mode=d;render()}else if(a=='pick'){sel=d;render()}
+ else if(a=='nav'){const n=+d;if(mode=='mes'){const x=P(sel);x.setDate(1);x.setMonth(x.getMonth()+n);sel=iso(x)}else sel=add(sel,n*(mode=='dia'?1:7));render()}});
+document.addEventListener('input',e=>{if(e.target.id=='q'){q=e.target.value;$('#hl').innerHTML=hlist()}});
+document.addEventListener('keydown',e=>{if(e.key=='Escape')$('#ov').innerHTML='';else if(e.key=='n'&&!$('#ov').innerHTML&&!/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)){e.preventDefault();sheet()}});
+document.addEventListener('change',e=>{if(e.target.id=='fi'){readFile(e.target.files[0]);e.target.value=''}});
+render();
+</script></body></html>
