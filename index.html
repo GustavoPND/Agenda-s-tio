@@ -128,7 +128,12 @@ function hlist(){const w=q.trim().toLowerCase();
  let l=w?S.filter(i=>(i.titulo+' '+i.obs).toLowerCase().includes(w)).sort((a,b)=>(b.data||b.inicio)>(a.data||a.inicio)?1:-1):[...S.filter(i=>i.status=='concluida'||i.status=='encerrado'),...S.flatMap(i=>i.tipo=='r'?i.feitos.map(f=>({...i,fim:f,_t:'Feito em '+fmt(f)})):[])].sort((a,b)=>b.fim>a.fim?1:-1);
  return l.map(i=>i._t?card(i,'',i._t):card(i,act(i))).join('')||`<div class="emp">${w?'Nada encontrado.':'Nada concluído ainda.'}</div>`}
 function hist(){return`<h1>Histórico</h1><p class="sub0">Pesquise também tarefas e acompanhamentos ativos.</p><input id="q" type="search" placeholder="Pesquisar (ex.: Radahn)" value="${esc(q)}"><div id="hl" style="margin-top:14px">${hlist()}</div>
- <h2>Seus dados</h2><div class="acts"><button data-act="export">Exportar</button><button data-act="import">Importar</button></div><input type="file" id="fi" accept=".json,application/json" hidden><div class="s" id="dmsg" style="margin-top:8px"></div>`}
+ <h2>Seus dados</h2><div class="acts"><button data-act="export">Exportar</button><button data-act="import">Importar</button></div><input type="file" id="fi" accept=".json,application/json" hidden><div class="s" id="dmsg" style="margin-top:8px"></div>
+ <h2>Limpeza</h2><p class="s" style="margin:0 0 10px;font-size:16px">Nada é apagado sozinho: você escolhe e confirma cada limpeza.</p>
+ <div class="row" style="align-items:end"><div><label>Histórico com mais de</label><select id="ln"><option value="30">30 dias</option><option value="60">60 dias</option><option value="90">90 dias</option></select></div><div><button style="width:100%" data-act="lp" data-d="antigo">Limpar antigo</button></div></div>
+ <div class="acts"><button data-act="lp" data-d="tudo">Limpar todo o histórico</button></div>
+ <div class="acts"><button class="d" data-act="lp" data-d="zerar">Zerar tudo</button></div>
+ ${hasUndo()?'<div class="acts"><button data-act="undo">Desfazer última limpeza</button></div>':''}`}
 function render(){$('#m').innerHTML={hoje,agenda,hist}[tab]();
  $('#nv').innerHTML=[['hoje','Hoje'],['agenda','Agenda'],['hist','Histórico']].map(([k,l])=>`<button class="${tab==k?'on':''}" data-act="tab" data-d="${k}">${l}</button>`).join('')+'<button class="p addtop" data-act="add">+ Adicionar</button>'}
 function sheet(id,dt){dt=dt||T;const it=S.find(i=>i.id==id)||{tipo:'t',titulo:'',data:dt,inicio:dt,hora:'',obs:'',dur:0,dataFim:'',status:'pendente',dias:[],feitos:[]};
@@ -157,6 +162,37 @@ function sheet(id,dt){dt=dt||T;const it=S.find(i=>i.id==id)||{tipo:'t',titulo:''
   if(ed)S=S.map(i=>i.id==id?o:i);else S.push({...o,id:Date.now(),fim:null});
   save();$('#ov').innerHTML='';render()}};draw()}
 function confirmar(msg,label,fn){$('#ov').innerHTML=`<div class="ov"><div class="sh"><h3>${msg}</h3><div class="acts"><button data-act="close">Cancelar</button><button class="p" data-act="yes">${label}</button></div></div></div>`;window.__yes=()=>{fn();save();$('#ov').innerHTML='';render()}}
+const UK=K+'-antes-de-limpar';
+function hasUndo(){try{return !!localStorage.getItem(UK)}catch(e){return false}}
+const ref=i=>i.tipo=='t'?(i.data||i.fim):(i.fim||i.inicio);
+function plan(tipo,n){const ids=new Set(),fe={};let nf=0;
+ S.forEach(i=>{if(i.tipo=='r'){const l=i.feitos.filter(f=>tipo=='tudo'||diff(T,f)>n);if(l.length){fe[i.id]=l;nf+=l.length}}
+  else if((i.status=='concluida'||i.status=='encerrado')&&(tipo=='tudo'||(ref(i)&&diff(T,ref(i))>n)))ids.add(i.id)});
+ return{ids,fe,ni:ids.size,nf}}
+function abrirLimpeza(tipo,n){const z=tipo=='zerar',p=plan(tipo,n);
+ if(!z&&!p.ni&&!p.nf){msg('Nada para limpar.');return}
+ window.__lp={tipo,n};
+ const tt=z?'Zerar tudo':tipo=='tudo'?'Limpar todo o histórico':`Limpar histórico com mais de ${n} dias`;
+ const tx=z?`Vai apagar TODOS os ${S.length} registros: tarefas, acompanhamentos e rotinas, inclusive os que estão ativos.`:`Vai apagar ${pl(p.ni,'registro')} já concluído(s) ou encerrado(s) e ${p.nf} ${p.nf==1?'marcação':'marcações'} de rotina feita(s). Pendentes, ativos e rotinas continuam.`+(tipo=='antigo'?' A idade conta pela data da tarefa (ou pelo dia em que o acompanhamento terminou).':'');
+ const nm=S.filter(i=>p.ids.has(i.id)).map(i=>i.titulo),lista=z?'':nm.slice(0,6).map(t=>'• '+esc(t.length>60?t.slice(0,60)+'…':t)).join('<br>')+(nm.length>6?`<br>e mais ${nm.length-6}`:'');
+ $('#ov').innerHTML=`<div class="ov"><div class="sh"><h3>${tt}</h3><p class="s">${tx}</p>${lista?`<p class="s" style="font-size:16px">${lista}</p>`:''}
+ <label style="display:flex;gap:10px;align-items:center;color:var(--tx);font-size:17px"><input id="bk" type="checkbox" checked style="width:24px;height:24px"> Baixar um backup antes de apagar</label>
+ ${z?'<label>Digite LIMPAR para confirmar</label><input id="cf" autocomplete="off">':''}
+ <div id="lerr" class="s late"></div>
+ <div class="acts" style="margin-top:14px"><button data-act="close">Cancelar</button><button class="p" style="background:var(--red)" data-act="lp-ok">Apagar</button></div></div></div>`}
+function aplicarLimpeza(){const{tipo,n}=window.__lp,z=tipo=='zerar',p=plan(tipo,n);
+ if(z&&$('#cf').value.trim().toUpperCase()!='LIMPAR'){$('#lerr').textContent='Digite LIMPAR para apagar tudo.';return}
+ if($('#bk').checked)doExport();
+ try{localStorage.setItem(UK,JSON.stringify(S))}catch(x){}
+ const antes=S.length;
+ if(z)S=[];else S=S.filter(i=>!p.ids.has(i.id)).map(i=>i.tipo=='r'&&p.fe[i.id]?{...i,feitos:i.feitos.filter(f=>!p.fe[i.id].includes(f))}:i);
+ save();$('#ov').innerHTML='';render();
+ msg(z?`Tudo apagado (${antes} registros). Dá para desfazer abaixo.`:`Limpeza feita: ${pl(p.ni,'registro')} e ${p.nf} ${p.nf==1?'marcação':'marcações'} apagados. Dá para desfazer abaixo.`)}
+function desfazer(){let c=null;try{c=JSON.parse(localStorage.getItem(UK))}catch(x){}
+ if(!Array.isArray(c)){msg('Não há limpeza para desfazer.');return}
+ c=c.filter(i=>i&&typeof i=='object'&&i.titulo).map(norm);const cur=new Map(S.map(i=>[i.id,i]));let n=0;
+ c.forEach(i=>{const e=cur.get(i.id);if(!e){S.push(i);n++}else if(e.tipo=='r'&&i.tipo=='r'){const f=[...new Set([...e.feitos,...i.feitos])].sort();n+=f.length-e.feitos.length;e.feitos=f}});
+ try{localStorage.removeItem(UK)}catch(x){}save();render();msg(`Limpeza desfeita: ${n} itens restaurados.`)}
 const msg=t=>{const e=$('#dmsg');if(e)e.textContent=t};
 function doExport(){const nome='agenda-sitio-backup-'+T+'.json';
  const b=new Blob([JSON.stringify({app:'agenda-sitio',versao:1,exportadoEm:new Date().toISOString(),dados:S},null,1)],{type:'application/json'});
@@ -172,6 +208,7 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(
  else if(a=='end')confirmar('Encerrar este acompanhamento?','Encerrar',()=>{const i=S.find(x=>x.id==id);i.status='encerrado';i.fim=T});
  else if(a=='del')confirmar('Tem certeza que deseja excluir?','Excluir',()=>{S=S.filter(x=>x.id!=id)});
  else if(a=='close')$('#ov').innerHTML='';else if(a=='ty')__ty(d);else if(a=='wd')__wd(+d);else if(a=='rdone'){const i=S.find(x=>x.id==id);i.feitos=i.feitos.includes(T)?i.feitos.filter(x=>x!=T):[...i.feitos,T];save();render()}else if(a=='ok')__ok();else if(a=='yes')__yes();
+ else if(a=='lp')abrirLimpeza(d,+($('#ln')?$('#ln').value:30));else if(a=='lp-ok')aplicarLimpeza();else if(a=='undo')desfazer();
  else if(a=='export')doExport();else if(a=='import')$('#fi').click();
  else if(a=='imp-add'){const ids=new Set(S.map(i=>i.id)),nv=__imp.filter(i=>!ids.has(i.id));S=[...S,...nv];save();$('#ov').innerHTML='';render();msg(nv.length?`Importado: ${nv.length} registros novos somados.`:'Nada novo: todos os registros já existiam.')}
  else if(a=='imp-rep'){try{localStorage.setItem(K+'-antes-de-importar',JSON.stringify(S))}catch(x){}S=__imp;save();$('#ov').innerHTML='';render();msg(`Importado: ${S.length} registros. A cópia dos dados anteriores ficou guardada no navegador.`)}
